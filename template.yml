@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  cognito
+  Example SAM project creating some basic user functionality with Cognito. 
+  
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        APP_REGION: "eu-east-1"
+        APP_LOG_LEVEL: "info"
+    Handler: "main"
+    Runtime: "go1.x"
+
+Resources:
+  ListPlansByUserFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: "list-plans-by-user"
+      CodeUri: cmd/lambdas/plans/list-by-user
+      Handler: list-by-user
+      Events:
+        HTTP:
+          Type: Api
+          Properties:
+            Path: /users/{userId}/plans
+            Method: GET
+            # RestApiId: !Ref RestApiId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: Plan
+  CreatePlanFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: "create-plan"
+      CodeUri: cmd/lambdas/plans/create
+      Handler: create
+      Events:
+        HTTP:
+          Type: Api
+          Properties:
+            Path: /plans
+            Method: POST
+            # RestApiId: !Ref RestApiId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: Plan
+
+  ## =====================================
+  ##          Comms
+  ## =====================================
+
+#   FnCustomMessage:
+#     Type: AWS::Serverless::Function
+#     Properties:
+#       CodeUri: src/account/account-email-messager/
+#       Handler: index.handler
+#       Runtime: nodejs10.x
+            
+#   ## =====================================
+#   ##          Authentication
+#   ## =====================================
+  
+#   DemoAuthenticatedFunction:
+#     Type: AWS::Serverless::Function 
+#     Properties:
+#       CodeUri: src/demo-auth
+#       Handler: index.lambdaHandler
+#       Runtime: nodejs12.x
+#       Environment:
+#         Variables:
+#           APP_USERPOOL_CLIENT_ID: !Ref CognitoUserPoolClient
+#           APP_USERPOOL_ID: !Ref CognitoUserPool
+#       Events:
+#         Login:
+#           Type: Api
+#           Properties:
+#             Path: /demo
+#             Method: get
+
+#   ### ================
+#   ### Lambda permissions
+#   ### ================
+
+#   CognitoCustomMessageInvocationPermission:
+#     Type: AWS::Lambda::Permission
+#     Properties:
+#       Action: lambda:InvokeFunction
+#       FunctionName: !GetAtt FnCustomMessage.Arn
+#       Principal: cognito-idp.amazonaws.com
+#       SourceArn: !GetAtt CognitoUserPool.Arn
+
+#   ## =====================================
+#   ##          Cognito
+#   ## =====================================
+  
+#   CognitoUserPool:
+#     Type: AWS::Cognito::UserPool
+#     Properties:
+      
+#       LambdaConfig:
+#         CustomMessage: !GetAtt FnCustomMessage.Arn
+#       AutoVerifiedAttributes:
+#         - email
+#       Policies:
+#         PasswordPolicy:
+#           MinimumLength: 8
+#           RequireLowercase: false
+#           RequireNumbers: true
+#           RequireSymbols: false
+#           RequireUppercase: false
+#           TemporaryPasswordValidityDays: 100
+#       Schema:
+#         - AttributeDataType: String
+#           Name: FullName
+#         - AttributeDataType: String
+#           Name: Birthday
+
+#   CognitoUserPoolClient:
+#     Type: AWS::Cognito::UserPoolClient
+#     Properties:
+#       ClientName: !Sub ${CognitoUserPool}-client
+#       GenerateSecret: false
+#       UserPoolId: !Ref CognitoUserPool
+#       ExplicitAuthFlows:
+#         - ALLOW_ADMIN_USER_PASSWORD_AUTH
+#         - ALLOW_CUSTOM_AUTH
+#         - ALLOW_USER_PASSWORD_AUTH
+#         - ALLOW_USER_SRP_AUTH
+#         - ALLOW_REFRESH_TOKEN_AUTH
+# Outputs:
+#   HelloWorldApi:
+#     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+#     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+#   HelloWorldFunction:
+#     Description: "Hello World Lambda Function ARN"
+#     Value: !GetAtt RegisterCreateAccountFunction.Arn

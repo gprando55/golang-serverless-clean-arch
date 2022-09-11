@@ -1,0 +1,34 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "application-back-go"
+region = "us-east-1"
+confirm_changeset = true
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1w285njnodf5g"
+s3_prefix = "application-back-go"
+disable_rollback = true
+
+[default.package]
+[default.package.parameters]
+stack_name = "application-back-go"
+region = "us-east-1"
+confirm_changeset = false
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "application-back-go"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1w285njnodf5g"
+s3_prefix = "application-back-go"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+disable_rollback = true
